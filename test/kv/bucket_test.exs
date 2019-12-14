@@ -37,7 +37,7 @@ defmodule KV.BucketTest do
     setup :empty_bucket
 
     test "returns nothing", %{empty: pid} do
-      assert Bucket.delete(pid, :milk) == -1
+      assert Bucket.delete(pid, :milk) == nil
     end
   end
 

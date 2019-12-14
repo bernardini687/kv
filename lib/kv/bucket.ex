@@ -9,8 +9,13 @@ defmodule KV.Bucket do
   end
 
   @doc """
-  Gets the value of the `key` from the `bucket`.
+  Gets the value/s of the `key/s` from the `bucket`.
   """
+  def get(bucket, keys) when is_list(keys) do
+    keys_to_values = fn map -> Enum.map(keys, &Map.get(map, &1)) end
+    Agent.get(bucket, &keys_to_values.(&1))
+  end
+
   def get(bucket, key) do
     Agent.get(bucket, &Map.get(&1, key))
   end
@@ -23,9 +28,9 @@ defmodule KV.Bucket do
   end
 
   @doc """
-  Deletes the `key` and its value from the `bucket`.
+  Deletes the `key` and returns its value from the `bucket`.
   """
   def delete(bucket, key) do
-    Agent.get_and_update(bucket, &Map.pop(&1, key, -1))
+    Agent.get_and_update(bucket, &Map.pop(&1, key))
   end
 end
