@@ -16,4 +16,12 @@ defmodule KV.RegistryTest do
     assert {"food", bucket} = Registry.create(pid, "food")
     assert Bucket.put(bucket, :milk, 3) == :ok
   end
+
+  test "removes buckets on exit", %{registry: pid} do
+    assert {"food", bucket} = Registry.create(pid, "food")
+
+    Agent.stop(bucket)
+
+    assert Registry.lookup(pid, "food") == :error
+  end
 end
