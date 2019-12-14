@@ -12,7 +12,10 @@ defmodule KV.Bucket do
   Gets the value/s of the `key/s` from the `bucket`.
   """
   def get(bucket, keys) when is_list(keys) do
-    keys_to_values = fn map -> Enum.map(keys, &Map.get(map, &1)) end
+    keys_to_values = fn map ->
+      Enum.map(keys, &Map.get(map, &1))
+    end
+
     Agent.get(bucket, &keys_to_values.(&1))
   end
 
