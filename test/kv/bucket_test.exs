@@ -45,7 +45,7 @@ defmodule KV.BucketTest do
   # SETUPS
 
   defp filled_bucket(_ctxt) do
-    {:ok, pid} = KV.Bucket.start_link([])
+    pid = start_supervised!(Bucket)
     Bucket.put(pid, :milk, 3)
     Bucket.put(pid, :banana, 2)
 
@@ -53,7 +53,7 @@ defmodule KV.BucketTest do
   end
 
   defp empty_bucket(_ctxt) do
-    {:ok, pid} = KV.Bucket.start_link([])
+    pid = start_supervised!(Bucket)
 
     %{empty: pid}
   end
