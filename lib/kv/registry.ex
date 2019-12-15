@@ -56,11 +56,11 @@ defmodule KV.Registry do
   end
 
   @impl true
-  def handle_info({:DOWN, ref, _, bucket, _}, state) do
-    IO.inspect(ref, label: "ref")
-    IO.inspect(bucket, label: "bucket")
-    IO.inspect(state, label: "state")
-    {:noreply, state}
+  def handle_info({:DOWN, ref, _, _bucket_pid, _}, {names, refs} = state) do
+    {name, refs} = Map.pop(refs, ref)
+    {_, names} = Map.pop(names, name)
+
+    {:noreply, {names, refs}}
   end
 
   @impl true
