@@ -46,19 +46,19 @@ defmodule KV.Registry do
     if Map.has_key?(names, name) do
       {:reply, {name, Map.get(names, name)}, state}
     else
-      {:ok, bucket} = KV.Bucket.start_link([])
-      ref = Process.monitor(bucket)
+      {:ok, bucket_pid} = KV.Bucket.start_link([])
+      ref = Process.monitor(bucket_pid)
       refs = Map.put(refs, ref, name)
-      names = Map.put(names, name, bucket)
+      names = Map.put(names, name, bucket_pid)
 
-      {:reply, {name, bucket}, {names, refs}}
+      {:reply, {name, bucket_pid}, {names, refs}}
     end
   end
 
   @impl true
-  def handle_info({:DOWN, ref, _, _bucket_pid, _}, {names, refs} = state) do
+  def handle_info({:DOWN, ref, :process, _, _}, {names, refs} = state) do
     {name, refs} = Map.pop(refs, ref)
-    {_, names} = Map.pop(names, name)
+    names = Map.delete(names, name)
 
     {:noreply, {names, refs}}
   end
