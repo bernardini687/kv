@@ -1,6 +1,8 @@
 defmodule KV.Registry do
   use GenServer
 
+  @me __MODULE__
+
   # # # #
   # CLIENT
 
@@ -8,7 +10,7 @@ defmodule KV.Registry do
   Starts the registry.
   """
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, :ok, opts)
+    GenServer.start_link(@me, :ok, opts)
   end
 
   @doc """
@@ -16,15 +18,19 @@ defmodule KV.Registry do
 
   Returns `{:ok, pid}` if the bucket exists, `:error` otherwise.
   """
-  def lookup(registry, name) do
-    GenServer.call(registry, {:lookup, name})
+  def lookup(name) do
+    GenServer.call(@me, {:lookup, name})
+  end
+
+  def lookup do
+    GenServer.call(@me, {:lookup, :all})
   end
 
   @doc """
   Creates a bucket associated with the given `name` in `registry`.
   """
-  def create(registry, name) do
-    GenServer.call(registry, {:create, name})
+  def create(name) do
+    GenServer.call(@me, {:create, name})
   end
 
   # # # #
@@ -34,6 +40,11 @@ defmodule KV.Registry do
   def init(:ok) do
     names = refs = %{}
     {:ok, {names, refs}}
+  end
+
+  @impl true
+  def handle_call({:lookup, :all}, _from, {names, _} = state) do
+    {:reply, Map.to_list(names), state}
   end
 
   @impl true
@@ -56,7 +67,7 @@ defmodule KV.Registry do
   end
 
   @impl true
-  def handle_info({:DOWN, ref, :process, _, _}, {names, refs} = state) do
+  def handle_info({:DOWN, ref, :process, _, _}, {names, refs}) do
     {name, refs} = Map.pop(refs, ref)
     names = Map.delete(names, name)
 
