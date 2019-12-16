@@ -28,6 +28,16 @@ defmodule KV.Bucket do
   @doc """
   Puts the `value` of the `key` in the `bucket`.
   """
+  # def put(bucket, key, value) when is_binary(bucket) do
+  #   case KV.Registry.lookup(bucket) do
+  #     {:ok, bucket_pid} ->
+  #       put(bucket_pid, key, value)
+
+  #     _ ->
+  #       IO.puts(:bucket_not_found)
+  #   end
+  # end
+
   def put(bucket, key, value) do
     Agent.update(bucket, &Map.put(&1, key, value))
   end
