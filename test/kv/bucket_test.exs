@@ -7,29 +7,29 @@ defmodule KV.BucketTest do
     setup :filled_bucket
 
     test "reads values by key", %{filled: pid} do
-      assert Bucket.get(pid, :milk) == 3
+      assert Bucket.get(pid, "foo") == 0
     end
 
     test "reads values by multiple keys", %{filled: pid} do
-      assert Bucket.get(pid, [:milk, :banana]) == [3, 2]
+      assert Bucket.get(pid, ["foo", "bar"]) == [0, 1]
     end
 
     test "reads nothing by absent keys", %{filled: pid} do
-      assert Bucket.get(pid, [:foo, :bar]) == [nil, nil]
+      assert Bucket.get(pid, ["qux"]) == [nil]
     end
 
     test "reads what is present", %{filled: pid} do
-      assert Bucket.get(pid, [:foo, :milk]) == [nil, 3]
+      assert Bucket.get(pid, ["qux", "foo"]) == [nil, 0]
     end
 
     test "stores new values by key", %{filled: pid} do
-      assert Bucket.put(pid, :mango, 1) == :ok
-      assert Bucket.get(pid, :mango) == 1
+      assert Bucket.put(pid, "baz", 2) == :ok
+      assert Bucket.get(pid, "baz") == 2
     end
 
     test "deletes values by key", %{filled: pid} do
-      assert Bucket.delete(pid, :milk) == 3
-      assert Bucket.get(pid, :milk) == nil
+      assert Bucket.delete(pid, "foo") == 0
+      assert Bucket.get(pid, "foo") == nil
     end
   end
 
@@ -37,7 +37,7 @@ defmodule KV.BucketTest do
     setup :empty_bucket
 
     test "returns nothing", %{empty: pid} do
-      assert Bucket.delete(pid, :milk) == nil
+      assert Bucket.delete(pid, "foo") == nil
     end
   end
 
@@ -46,8 +46,8 @@ defmodule KV.BucketTest do
 
   defp filled_bucket(_ctxt) do
     pid = start_supervised!(Bucket)
-    Bucket.put(pid, :milk, 3)
-    Bucket.put(pid, :banana, 2)
+    Bucket.put(pid, "foo", 0)
+    Bucket.put(pid, "bar", 1)
 
     %{filled: pid}
   end

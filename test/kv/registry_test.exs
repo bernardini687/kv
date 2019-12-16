@@ -1,27 +1,28 @@
 defmodule KV.RegistryTest do
   use ExUnit.Case, async: true
 
-  alias KV.{Bucket, Registry}
+  alias KV.Registry
 
   setup do
-    pid = start_supervised!(Registry)
-    %{registry: pid}
+    start_supervised!({Registry, []})
+    :ok
   end
 
-  test "starts without buckets", %{registry: pid} do
-    assert Registry.lookup(pid, "food") == :error
+  test "starts without buckets" do
+    assert Registry.lookup() == []
   end
 
-  test "spawns buckets", %{registry: pid} do
-    assert {"food", bucket} = Registry.create(pid, "food")
-    assert Bucket.put(bucket, :milk, 3) == :ok
+  test "spawns buckets" do
+    assert {"foo", foo} = Registry.create("foo")
+    assert Registry.lookup("foo") == {:ok, foo}
+    Agent.stop(foo)
   end
 
-  test "removes buckets on exit", %{registry: pid} do
-    assert {"food", bucket} = Registry.create(pid, "food")
+  test "removes buckets on exit" do
+    assert {"bar", bar} = Registry.create("bar")
 
-    Agent.stop(bucket)
+    Agent.stop(bar)
 
-    assert Registry.lookup(pid, "food") == :error
+    assert Registry.lookup("bar") == :error
   end
 end
