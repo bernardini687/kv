@@ -41,6 +41,10 @@ defmodule KV.BucketTest do
     end
   end
 
+  test "are temporary workers" do
+    assert Supervisor.child_spec(KV.Bucket, []).restart == :temporary
+  end
+
   # # # #
   # SETUPS
 

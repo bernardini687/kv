@@ -18,11 +18,19 @@ defmodule KV.RegistryTest do
     Agent.stop(foo)
   end
 
-  test "removes buckets on exit" do
+  test "removes bucket on exit" do
     assert {"bar", bar} = Registry.create("bar")
 
     Agent.stop(bar)
 
     assert Registry.lookup("bar") == :error
+  end
+
+  test "removes bucket on crash" do
+    assert {"baz", baz} = Registry.create("baz")
+
+    Agent.stop(baz, :shutdown)
+
+    assert Registry.lookup("baz") == :error
   end
 end
